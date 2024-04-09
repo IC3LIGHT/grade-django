@@ -1,0 +1,57 @@
+body {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.header {
+    height: 52px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #333;
+    color: white;
+    padding: 5px 20px;
+    z-index: 2;
+}
+
+.menu {
+    display: none;
+    position: fixed;
+    top: 50px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    border-radius: 5px;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.menu a, .button_menu {
+    color: white;
+    padding: 10px 15px;
+    text-decoration: none;
+    display: block;
+    background-color: transparent;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    overflow: hidden;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    position: absolute;
+    bottom: -12px;
+    left: 0;
+    width: 100%;
+    height: auto;
+    line-height: normal;
+}

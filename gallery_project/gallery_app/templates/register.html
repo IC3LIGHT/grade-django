@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="/media/favicon/icon.ico" rel="icon">
+    <title>Регистрация</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <style>
+        body {display: flex; text-align: center; margin: 80px;}
+        .form-signin {width: 100%; max-width: 400px; padding: 15px; border: 1px solid #ccc; border-radius: 5px; background: #f9f9f9; margin-top: 80px;}
+        .form-signin input[type="text"], .form-signin input[type="password"] {width: 100%; margin-bottom: 20px; border-radius: 5px; border: 1px solid #ced4da; padding: 0 10px; height: 40px;}
+        .form-group {text-align: left; position: relative;}
+        .btn-primary {width: 100%; margin-top: 25px; margin-bottom: 15px;}
+        .auth_field {display: flex; color: black; justify-content: center;}
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+<h2 class="text-center mb-4">Регистрация</h2>
+<form class="form-signin" id="registrationForm" method="post">
+    {% csrf_token %}
+    <div class="form-group">{{ form.email.label_tag }}{{ form.email }}
+        <div class="error-message" id="error-email"></div>
+    </div>
+    <div class="form-group">{{ form.phone.label_tag }}{{ form.phone }}
+        <div class="error-message" id="error-phone"></div>
+    </div>
+    <div class="form-group">{{ form.password1.label_tag }}{{ form.password1 }}
+        <div class="error-message" id="error-password1"></div>
+    </div>
+    <div class="form-group">{{ form.password2.label_tag }}{{ form.password2 }}
+        <div class="error-message" id="error-password2"></div>
+    </div>
+    <div class="form-group">{{ form.birthday.label_tag }}{{ form.birthday }}
+        <div class="error-message" id="error-birthday"></div>
+    </div>
+    <button class="btn btn-lg btn-primary btn-block" type="submit">Зарегистрироваться</button>
+    <a class="auth_field" href="/auth/">Уже зарегистрированы? Войти</a>
+</form>
+<script src="/static/js/menu.js"></script>
+<script src="/static/js/register_ajax.js"></script>
+<script src="/static/js/register_delete_focus.js"></script>
+</body>
+</html>

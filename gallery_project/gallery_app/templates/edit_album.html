@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="/media/favicon/icon.ico" rel="icon">
+    <title>Редактирование альбома</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <style>
+        body {margin-top: 70px;}
+        .album-form {margin: 0 auto; max-width: 500px;}
+        .form-group label {font-weight: bold; display: block;}
+        .form-control {margin-bottom: 0.5rem; height: 29px; width: 240px; margin-left: 10px; border: 1.5px solid #717478;}
+        .btn-primary {width: 100%; padding: 0.5rem; margin-top: 1rem;}
+        #id_title, textarea {width: 100%;}
+        #thumbnails-container, #existing-thumbnails-container {display: flex; flex-wrap: wrap; gap: 10px;}
+        .thumbnail-wrapper {display: flex; align-items: flex-start; width: 500px;}
+        .thumbnail {width: 250px; height: 150px; object-fit: cover; border: 1px solid #ddd; box-shadow: 1px 1px 2px #ccc;}
+        .error-message, #id_cover, .photos_multiple {position: relative; visibility: hidden; width: 0; height: 0;}
+        .cover_button, .photos_button {margin-top:10px;}
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+<h2 class="text-center mb-4">Редактирование альбома</h2>
+<form class="album-form" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <div class="form-group">{{ album_form.title.label_tag }}{{ album_form.title }}<div class="error-message" id="error-title"></div></div>
+    <div class="form-group">{{ album_form.description.label_tag }}{{ album_form.description }}<div class="error-message" id="error-description"></div></div>
+    <div class="form-group">
+        {{ album_form.cover.label_tag }}
+        <div id="cover-thumbnail-container">{% if album.cover %}<img src="{{ album.cover.url }}" class="thumbnail">{% endif %}</div>
+        <input type="file" name="{{ album_form.cover.name }}" id="{{ album_form.cover.id_for_label }}" />
+        <button class="cover_button" onclick="document.getElementById('{{ album_form.cover.id_for_label }}').click()" type="button">Выбрать файл</button>
+        <div class="error-message" id="error-cover"></div>
+    </div>
+    <div class="form-group">
+        <label for="albumPhotos">Фотографии альбома:</label>
+        <input class="photos_multiple" id="albumPhotos" multiple name="photos" type="file">
+        <button class="photos_button" onclick="document.getElementById('albumPhotos').click()" type="button">Выбрать файлы</button>
+        <div class="error-message" id="error-image"></div>
+    </div>
+    <div id="existing-thumbnails-container">
+        {% for photo in existing_photos %}
+        <div class="thumbnail-wrapper">
+            <img src="{{ photo.image.url }}" class="thumbnail">
+            <input type="text" value="{{ photo.description }}" name="description_{{ photo.id }}" class="form-control">
+        </div>
+        {% endfor %}
+    </div>
+    <div id="thumbnails-container"></div>
+    <button class="btn btn-primary" type="submit">Сохранить изменения</button>
+</form>
+<script src="/static/js/menu.js"></script>
+<script src="/static/js/edit_album_validate_images.js"></script>
+<script src="/static/js/edit_album_validate_cover.js"></script>
+<script src="/static/js/edit_album_old_description.js"></script>
+<script src="/static/js/edit_album_clear_old_containers.js"></script>
+<script> //ajax, проблемы с импортом извне
+document.addEventListener('DOMContentLoaded', function() {
+    var form = document.querySelector('.album-form');
+    form.noValidate = true;
+    var formSubmitted = false;
+
+    function isFormValid() {
+        return Array.from(form.elements).every(function(element) {
+            return element.checkValidity();
+        });
+    }
+
+    function clearErrors() {
+        var errorMessages = document.querySelectorAll(".error-message");
+        errorMessages.forEach(function(element) {
+            element.textContent = '';
+        });
+    }
+
+    function sendData(checkValidity = false) {
+        if (checkValidity && isFormValid()) {
+            clearErrors();
+            return;
+        }
+
+        var formData = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "/albums/{{ album.id }}/edit/", true);
+        xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    window.location.href = "/";
+                } else {
+                    clearErrors();
+                    Object.keys(response.errors).forEach(function(key) {
+                        var errorContainer = document.getElementById("error-" + key);
+                        var errors = response.errors[key].map(error => error.message).join(", ");
+                        if (errorContainer) {
+                            errorContainer.textContent = errors;
+                        } else {
+                            console.log("Проверить ошибки " + key);
+                        }
+                    });
+                }
+            } else {
+                alert("Произошла ошибка на сервере, проверьте корректность загружаемых файлов");
+            }
+        };
+
+        xhr.send(formData);
+    }
+
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        formSubmitted = true;
+        sendData();
+    });
+
+    form.addEventListener('input', function() {
+        if (formSubmitted) {
+            sendData(true);
+        }
+    });
+});
+</script>
+</body>
+</html>

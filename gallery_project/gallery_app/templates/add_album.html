@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link href="/media/favicon/icon.ico" rel="icon">
+    <title>Создание альбома</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/static/css/styles.css" rel="stylesheet">
+    <style>
+        body {margin-top: 70px}
+        .album-form {margin: 0 auto; max-width: 500px;}
+        .form-group label {font-weight: bold; display: block;}
+        .form-control {margin-bottom: 0.5rem; width: 100%;}
+        .btn-primary {width: 100%; padding: 0.5rem; margin-top: 1rem;}
+        #id_title {width: 100%}
+        textarea{ width: 100% }
+        #thumbnails-container {display: flex; flex-wrap: wrap; gap: 10px;}
+        .thumbnail-wrapper {display: flex; align-items: flex-start; gap: 10px; width: 500px;}
+        .thumbnail {width: 250px; height: 150px; object-fit: cover; border: 1px solid #ddd; box-shadow: 1px 1px 2px #ccc;}
+        .thumbnail + input {flex-grow: 1;}
+        .error-message {position: relative;}
+        .custom-file-input {visibility: hidden; width: 0; height: 0;}
+        .cover_button {margin-top:10px;}
+        .photos_multiple{visibility: hidden; width: 0; height: 0;}
+        .photos_button {margin-top:10px;}
+    </style>
+</head>
+<body>
+{% include 'header.html' %}
+<script src="/static/js/menu.js"></script>
+<h2 class="text-center mb-4">Создание альбома</h2>
+<form class="album-form" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <div class="form-body">
+        <div class="form-group">
+            {{album_form.title.label_tag}}
+            {{album_form.title}}
+            <div class="error-message" id="error-title"></div>
+        </div>
+        <div class="form-group">
+            {{album_form.description.label_tag}}
+            {{album_form.description}}
+            <div class="error-message" id="error-description"></div>
+        </div>
+        <div class="form-group">
+            {{album_form.cover.label_tag}}
+            <div class="custom-file-upload">
+                <input class="custom-file-input" id="{{ album_form.cover.id_for_label }}"
+                       name="{{ album_form.cover.name }}" type="file"/>
+                <button class="cover_button"
+                        onclick="document.getElementById('{{ album_form.cover.id_for_label }}').click()" type="button">
+                    Выбрать файл
+                </button>
+                <div class="error-message" id="error-cover"></div>
+            </div>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="albumPhotos">Фотографии альбома:</label>
+        <div class="custom-files-upload">
+            <input class="photos_multiple" id="albumPhotos" multiple name="photos" type="file">
+            <button class="photos_button" onclick="document.getElementById('albumPhotos').click()" type="button">
+                Выбрать файлы
+            </button>
+            <div class="error-message" id="error-image"></div>
+            <div id="thumbnails-container"></div>
+        </div>
+    </div>
+    <button class="btn btn-primary" type="submit">Создать альбом</button>
+</form>
+<script src="/static/js/add_album_images_validate_cover.js"></script>
+<script src="/static/js/add_album_validate_images_album.js"></script>
+<script src="/static/js/add_album_ajax.js"></script>
+</body>
+</html>

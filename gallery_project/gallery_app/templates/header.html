@@ -1,0 +1,25 @@
+{% load custom_filters %}
+<div class="header">
+    <a href="/" style="text-decoration: none; color: white;">Главная</a>
+    {% if user.is_authenticated %}
+    <span>Привет, {{ user.email|split_at }}</span>
+    {% endif %}
+    <button class="button_menu" onclick="toggleMenu()">Меню</button>
+    <div class="menu" id="menu" style="display: none;">
+        {% if user.is_authenticated %}
+        <a href="/albums/">Все альбомы</a>
+        <a href="/albums/user/">Мои альбомы</a>
+        <a href="/albums/add_album/">Создать альбом</a>
+        {% if user.is_authenticated and album.user == user %}
+            {% if current_path|link_match:"^/albums/\d+/$" %}
+                <a class="edit-button" href="{{ current_path }}edit/">Редактировать</a>
+            {% endif %}
+        {% endif %}
+        <a href="/logout/">Выход</a>
+        {% else %}
+        <a href="/albums/">Все альбомы</a>
+        <a href="/auth/">Авторизация</a>
+        <a href="/register/">Регистрация</a>
+        {% endif %}
+    </div>
+</div>
