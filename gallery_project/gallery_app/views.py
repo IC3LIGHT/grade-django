@@ -29,6 +29,7 @@ def albums(request):
     latest_albums = all_albums.order_by('-updated_at')[:10]
     return render(request, 'latest_albums.html', {'latest_albums': latest_albums, 'title': 'Альбомы'})
 
+
 @anonymous_required(redirect_url='/')
 def register(request):
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -44,10 +45,12 @@ def register(request):
             return JsonResponse({"success": False, "errors": errors})
     else:
         if request.method == 'POST':
-            return HttpResponseBadRequest("Ошибка запроса")
+            return HttpResponseBadRequest("Invalid request")
         else:
             form = CustomUserCreationForm()
             return render(request, 'register.html', {'form': form})
+
+
 @anonymous_required(redirect_url='/')
 def auth(request):
     if request.method == 'POST' and request.headers.get('X-Requested-With') == 'XMLHttpRequest':
@@ -65,7 +68,7 @@ def auth(request):
                 if user is not None:
                     login(request, user)
                     return JsonResponse({"success": True})
-                else: #сомнительно, но окэй
+                else:  # сомнительно, но окэй
                     errors = {
                         "password": [
                             {
@@ -129,18 +132,16 @@ def edit_album(request, album_id):
                 Photo.objects.filter(album=updated_album).delete()
                 for i, file in enumerate(photos_files):
                     description_key = f'description_new_{i}'
-                    description = request.POST.get(description_key, '') # если нужно, чтобы alt не был пустым - or updated_album.title
+                    description = request.POST.get(description_key,
+                                                   '')  # если нужно, чтобы alt не был пустым - or updated_album.title
                     Photo.objects.create(album=updated_album, image=file, description=description)
             else:
                 for key, value in request.POST.items():
                     if key.startswith('description_') and not key.startswith('description_new_'):
                         photo_id = key.split('_')[1]
-                        try:
-                            photo = Photo.objects.get(id=photo_id, album=updated_album)
-                            photo.description = value # здесь тоже - or updated_album.title
-                            photo.save()
-                        except Photo.DoesNotExist:
-                            print('Как же было это тяжело')
+                        photo = Photo.objects.get(id=photo_id, album=updated_album)
+                        photo.description = value  # здесь тоже - or updated_album.title
+                        photo.save()
 
             return JsonResponse({'success': True})
         else:
@@ -162,6 +163,7 @@ def detail_album(request, album_id):
 def user_albums(request):
     user_albums = Album.objects.all().filter(user=request.user).order_by('-updated_at')[:10]
     return render(request, 'latest_albums.html', {'latest_albums': user_albums, 'title': 'Мои альбомы'})
+
 
 def user_logout(request):
     logout(request)

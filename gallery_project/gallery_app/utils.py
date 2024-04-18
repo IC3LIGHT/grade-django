@@ -1,6 +1,8 @@
 import datetime as dt
-
 import requests
+from PIL import Image
+import io
+from django.core.files.uploadedfile import SimpleUploadedFile
 
 
 def compare_date(date):
@@ -45,3 +47,23 @@ def is_valid_date(date):
             return day <= 28
 
     return False
+
+
+
+def generate_phone_number():
+    import random
+    number = "+7"
+    for _ in range(10):
+        number += str(random.randint(0, 9))
+    return number
+
+
+def create_test_image():
+    # Создание изображения
+    image = Image.new('RGB', (100, 100), color='red')
+    image_file = io.BytesIO()
+    image.save(image_file, format='JPEG')
+    image_file.name = 'test.jpg'
+    image_file.seek(0)
+
+    return SimpleUploadedFile(image_file.name, image_file.read(), content_type='image/jpeg')

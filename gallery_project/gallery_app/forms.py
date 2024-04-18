@@ -18,12 +18,12 @@ class CustomUserCreationForm(UserCreationForm):
         super(UserCreationForm, self).__init__(*args, **kwargs)
         self.fields['email'].label = 'Адрес электронной почты'
         self.fields['phone'].label = 'Телефон'
-        self.fields['phone'].initial = '+7'
+
         self.fields['password1'].label = 'Пароль'
         self.fields['password2'].label = 'Подтверждение пароля'
         self.fields['birthday'].label = 'Дата рождения'
 
-        for fieldname in ['email', 'password1', 'password2']:
+        for fieldname in ['email', 'phone', 'password1', 'password2']:
             self.fields[fieldname].error_messages = {'required': 'Это поле не может быть пустым.'}
 
     def clean_password1(self):
@@ -40,8 +40,6 @@ class CustomUserCreationForm(UserCreationForm):
 
     def clean_phone(self):
         phone = self.cleaned_data.get('phone')
-        if len(phone) == 2:
-            raise ValidationError("Это поле не может быть пустым.")
         if not re.match(r"^\+7\d{10}$", phone):
             raise ValidationError("Номер телефона должен быть в формате +7XXXXXXXXXX (X - цифра).")
         if len(phone) < 12:

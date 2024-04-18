@@ -7,6 +7,12 @@ from django.db import models
 
 class MyUserManager(BaseUserManager):
     def create_user(self, email, phone=None, password=None, birthday=None):
+        if not email:
+            raise ValueError('Поле не может быть пустым')
+        if phone is None:
+            raise ValueError('Поле не может быть пустым')
+        if not password:
+            raise ValueError('Поле не может быть пустым')
         user = self.model(
             email=self.normalize_email(email),
             phone=phone,
@@ -15,7 +21,6 @@ class MyUserManager(BaseUserManager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-
 
 class MyUser(AbstractBaseUser):
     email = models.CharField(verbose_name='email address', max_length=255, unique=True)
@@ -45,6 +50,39 @@ def new_file_name(instance, filename):
 
     return os.path.join(base_path, new_filename)
 
+class AlbumManager(models.Manager):
+    def create_album(self, title, description, cover, user):
+        if not title:
+            raise ValueError('Поле не может быть пустым')
+        if not description:
+            raise ValueError('Поле не может быть пустым')
+        if not cover:
+            raise ValueError('Поле не может быть пустым')
+        if not user:
+            raise ValueError('Поле не может быть пустым')
+        album = self.model(
+            title=title,
+            description=description,
+            cover=cover,
+            user=user
+        )
+        album.save()
+        return album
+
+class PhotoManager(models.Manager):
+    def create_photo(self, album, image, description):
+        if not album:
+            raise ValueError('Поле не может быть пустым')
+        if not image:
+            raise ValueError('Поле не может быть пустым')
+        photo = self.model(
+            album=album,
+            image=image,
+            description=description
+        )
+        photo.save()
+        return photo
+
 class Album(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
@@ -53,8 +91,11 @@ class Album(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
+    objects = AlbumManager()
 
 class Photo(models.Model):
     album = models.ForeignKey(Album, related_name='photos', on_delete=models.CASCADE)
     image = models.ImageField(upload_to=new_file_name, max_length=1000)
     description = models.TextField(blank=True)
+
+    objects = PhotoManager()

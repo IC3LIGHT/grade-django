@@ -3,4 +3,5 @@
 gallery_project/gallery_app/__pycache__
 gallery_project/gallery_app/migrations/__pycache__
 gallery_project/gallery_project/__pycache__
+gallery_project/gallery_app/tests/__pycache__
 gallery_project/gallery_app/templatetags/__pycache__
